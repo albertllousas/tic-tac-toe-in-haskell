@@ -26,7 +26,7 @@ Where grid:
 | (2,0) (2,1) (2,2) |
 ```
 
-Take a look on the [tests](/test/TicTacToeSpec.hs) to see how to see it in action!
+Take a look on the [tests](/test/TicTacToeSpec.hs) to see it in action!
 
 ## Running tests
 
