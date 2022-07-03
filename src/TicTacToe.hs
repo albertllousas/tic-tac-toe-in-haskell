@@ -4,6 +4,7 @@ module TicTacToe (
 ) where
 
 import Data.List
+import Data.Ix
 
 data Player = X | O deriving (Eq, Show)
 
@@ -31,6 +32,7 @@ play player pos game@Game{ grid = g, status = NextTurn s }
         | player /= s = Left InvalidPlayerTurn
         | not (validGame game) = Left InvalidGridSize
         | not (validGridPosition pos) = Left InvalidGridPosition
+        | fieldAlreadyTaken pos g = Left FieldAlreadyTaken
         | ifThreeInARow newGrid s = Right $ game { grid = newGrid, status = Winner s }
         | ifThreeInAColumn newGrid s = Right $ game { grid = newGrid, status = Winner s }
         | ifThreeInADiagonal newGrid s = Right $ game { grid = newGrid, status = Winner s }
@@ -39,13 +41,17 @@ play player pos game@Game{ grid = g, status = NextTurn s }
     where newGrid = markField player pos g
 play _ _ _ = Left $ GameAlreadyFinished
 
+fieldAlreadyTaken (i,j) g = check (g!!i!!j)
+  where check (TakenBy _) = True
+        check Empty = False
+
 next O = X
 next X = O
 
 validGame game@Game { grid = [[_,_,_],[_,_,_],[_,_,_]], status=_} = True
 validGame _ = False
 
-validGridPosition _ = True
+validGridPosition (i, j) = inRange (0,2) i && inRange (0,2) j
 
 ifThreeInARow g s = (nub (g !! 0)) == [TakenBy s] || (nub (g !! 1)) == [TakenBy s] || (nub (g !! 2)) == [TakenBy s]
 

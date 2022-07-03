@@ -78,23 +78,37 @@ spec = do
 
     it "should fail when trying to play a wrong field position" $ do
       play X (1,4) initialGame `shouldBe` Left InvalidGridPosition
---
---    it "should fail when a player play to times consecutively" $ do
---      play X (1,1) initialGame `shouldBe` Left InvalidPlayerTurn
---
---    it "should fail when trying to play an already marked field in the grid" $ do
---      play X (1,1) initialGame `shouldBe` Left FieldAlreadyTaken
---
---    it "should fail when trying to play a finished game with a winner" $ do
---      play X (1,1) initialGame `shouldBe` Left GameAlreadyFinished
---
---    it "should fail when trying to play a finished game with a draw" $ do
---      play X (1,1) initialGame `shouldBe` Left GameAlreadyFinished
 
---it "should not be valid if it has not nine fields in a 3x3 grid" $ do
---      let game = Game { grid = [[Empty, Empty, Empty]], status = NextTurn X }
---      valid game `shouldBe` Left InvalidGridSize
+    it "should fail when a player plays in the wrong turn " $ do
+      play O (1,1) initialGame `shouldBe` Left InvalidPlayerTurn
 
---    describe "Acceptance" $ do
+    it "should fail when trying to play an already marked field in the grid" $ do
+      let ongoingGame = Game {
+          grid = [[TakenBy X, TakenBy X, Empty],
+                  [TakenBy O, TakenBy O, Empty],
+                  [Empty, Empty, Empty]],
+          status = NextTurn X
+        }
+      play X (1,1) ongoingGame `shouldBe` Left FieldAlreadyTaken
 
---        it "full game" $ do
+    it "should fail when trying to play a finished game with a winner" $ do
+      let finished = Game {
+              grid = [[TakenBy X, TakenBy X, TakenBy X],
+                      [TakenBy O, TakenBy O, Empty],
+                      [Empty, Empty, Empty]],
+              status = Winner X
+            }
+      play X (1,1) finished `shouldBe` Left GameAlreadyFinished
+
+    it "should fail when trying to play a finished game with a draw" $ do
+      let finished = Game {
+              grid = [[TakenBy X, TakenBy X, TakenBy O],
+                      [TakenBy X, TakenBy O, TakenBy X],
+                      [TakenBy O, TakenBy O, TakenBy X]],
+              status = GameIsADraw
+            }
+      play X (1,1) finished `shouldBe` Left GameAlreadyFinished
+
+    it "should not be valid if it has not nine fields in a 3x3 grid" $ do
+      let invalid = Game { grid = [[Empty, Empty, Empty]], status = NextTurn X }
+      play X (1,1) invalid `shouldBe` Left InvalidGridSize
